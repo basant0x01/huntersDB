@@ -16,9 +16,7 @@ Instead of running recon repeatedly, HuntersDB provides **ready-to-use, continuo
 ## 🔥 Key Features
 
 ### 🌐 Global Recon Dataset
-
 * Aggregates subdomains from:
-
   * HackerOne
   * Bugcrowd
   * YesWeHack
@@ -28,9 +26,7 @@ Instead of running recon repeatedly, HuntersDB provides **ready-to-use, continuo
 ---
 
 ### ⚡ Continuous Scanning (24/7)
-
 * Automated scanning pipeline:
-
   * Alive detection (`httpx`)
   * Deep scanning
   * Vulnerability scanning (`nuclei`)
@@ -39,9 +35,7 @@ Instead of running recon repeatedly, HuntersDB provides **ready-to-use, continuo
 ---
 
 ### 🧠 Recon Intelligence Engine
-
 Enriched data per subdomain:
-
 * Open ports (naabu)
 * Crawled endpoints (katana, gau, wayback)
 * Hidden parameters (arjun)
@@ -54,7 +48,6 @@ Enriched data per subdomain:
 ---
 
 ### 🧬 Leak Intelligence
-
 * Integrates breach intelligence (HackedList + others)
 * Maps compromised subdomains
 * Tracks exposure history
@@ -62,7 +55,6 @@ Enriched data per subdomain:
 ---
 
 ### 🧹 Garbage Filtering Engine
-
 * Removes low-value / ISP / noise subdomains
 * Uses entropy + pattern detection
 * Keeps dataset **clean and high-signal**
@@ -70,13 +62,10 @@ Enriched data per subdomain:
 ---
 
 ### ⚙️ Adaptive Scanning Engine
-
 * Dynamically adjusts:
-
   * Threads
   * Rate limits
 * Based on:
-
   * CPU usage
   * Scan throughput
 * Maximizes speed without overload
@@ -84,10 +73,8 @@ Enriched data per subdomain:
 ---
 
 ### 🔁 Autonomous Monitoring
-
 * Periodic re-scanning of assets
 * Detects:
-
   * New subdomains
   * Changes in attack surface
   * Newly exposed vulnerabilities
@@ -95,9 +82,7 @@ Enriched data per subdomain:
 ---
 
 ### 📡 Webhook Notifications
-
 Supports:
-
 * Discord
 * Slack
 * Telegram
@@ -108,7 +93,7 @@ Supports:
 
 HuntersDB follows a **distributed, async-first architecture**:
 
-```
+```text
                 ┌────────────────────┐
                 │   FastAPI Server   │
                 │  (API + UI Layer)  │
@@ -138,13 +123,13 @@ HuntersDB follows a **distributed, async-first architecture**:
 
 ## 🧩 Core Components
 
-| Component           | Description                           |
-| ------------------- | ------------------------------------- |
-| **API Server**      | FastAPI backend serving API + UI      |
-| **Worker System**   | Executes scanning, recon, sync jobs   |
-| **Redis Queue**     | Priority job queue with retry support |
-| **PostgreSQL**      | Stores all recon & intelligence data  |
-| **Process Manager** | Controls subprocess execution safely  |
+| Component | Description |
+|---|---|
+| **API Server** | FastAPI backend serving API + UI |
+| **Worker System** | Executes scanning, recon, sync jobs |
+| **Redis Queue** | Priority job queue with retry support |
+| **PostgreSQL** | Stores all recon & intelligence data |
+| **Process Manager** | Controls subprocess execution safely |
 
 ---
 
@@ -162,49 +147,30 @@ HuntersDB follows a **distributed, async-first architecture**:
 ## ⚡ Installation
 
 ### 1. Clone the repository
-
 ```bash
 git clone https://github.com/yourusername/huntersdb.git
 cd huntersdb
 ```
 
----
-
 ### 2. Setup environment
-
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
----
-
 ### 3. Install dependencies
-
 * PostgreSQL
 * Redis
-* Go tools:
+* Go tools: `httpx`, `subfinder`, `nuclei`, `naabu`, `ffuf`, etc.
 
-  * httpx
-  * subfinder
-  * nuclei
-  * naabu
-  * ffuf
-  * etc.
-
-Run:
-
+Run the installer:
 ```bash
 bash install_tools.sh
 ```
 
----
-
 ### 4. Configure environment
-
 Create `.env`:
-
 ```env
 DATABASE_URL=postgresql://user:pass@localhost:5432/huntersdb
 REDIS_URL=redis://localhost:6379/0
@@ -212,35 +178,25 @@ SUBMIND_USER=admin
 SUBMIND_PASS=admin
 ```
 
----
-
 ### 5. Run the system
-
-#### Start API server
-
+**Start API server:**
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 5000
 ```
-
-#### Start worker
-
+**Start worker:**
 ```bash
 python -m workers.queue_consumer
 ```
-
-Or:
-
+**Or run both automatically:**
 ```bash
 bash run.sh
 ```
 
 ---
 
-## 📡 API (Planned / Recommended Usage)
+## 📡 API (Recommended Usage)
 
-HuntersDB is designed to be **API-first**.
-
-Example endpoints:
+HuntersDB is designed to be **API-first**. Example endpoints:
 
 ```http
 GET /api/intel/subdomains?program=tesla
@@ -252,7 +208,6 @@ GET /api/intel/changes?last=24h
 ---
 
 ## 🎯 Use Cases
-
 * Mass bug bounty hunting
 * Recon automation pipelines
 * Custom vulnerability scanners
@@ -262,45 +217,36 @@ GET /api/intel/changes?last=24h
 ---
 
 ## 🚨 Scaling Strategy
-
 HuntersDB is built for horizontal scaling:
-
-* Add more workers → increase throughput
-* Redis handles distributed job queue
-* PostgreSQL handles centralized data
-* Stateless API server
+* **Add more workers** → increase throughput
+* **Redis** handles distributed job queue
+* **PostgreSQL** handles centralized data
+* **Stateless** API server
 
 ---
 
 ## 🔐 Security Notes
-
 * Uses session-based authentication (initial version)
-* Recommended improvements:
-
+* Recommended future improvements:
   * API keys
-  * rate limiting
+  * Rate limiting
   * RBAC
-  * audit logging
+  * Audit logging
 
 ---
 
 ## 🛣️ Roadmap
-
-* [ ] Public API layer for hunters
-* [ ] Advanced risk scoring system
-* [ ] Real-time data streaming
-* [ ] Distributed worker orchestration
-* [ ] SaaS deployment
-* [ ] CLI client for hunters
+- [ ] Public API layer for hunters
+- [ ] Advanced risk scoring system
+- [ ] Real-time data streaming
+- [ ] Distributed worker orchestration
+- [ ] SaaS deployment
+- [ ] CLI client for hunters
 
 ---
 
 ## 🤝 Contributing
-
-Contributions are welcome.
-
-Please:
-
+Contributions are welcome. Please:
 1. Fork the repo
 2. Create a feature branch
 3. Submit a pull request
@@ -308,25 +254,20 @@ Please:
 ---
 
 ## 📄 License
-
 MIT License
 
 ---
 
 ## 🧠 Vision
-
 > HuntersDB aims to eliminate redundant recon work and provide a unified, continuously updated intelligence layer for bug bounty hunters worldwide.
 
 ---
 
 ## ⭐ Support
-
 If you find this project useful:
-
 * Star the repository ⭐
 * Share with the community
 * Contribute ideas & improvements
 
 ---
-
 **Built for hackers. Scaled for the future.**
