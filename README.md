@@ -11,6 +11,20 @@
 
 Instead of running recon repeatedly, HuntersDB provides **ready-to-use, continuously updated intelligence** that hunters can query and integrate into their own tools.
 
+> ![HuntersDB Hero](/static/screenshots/hero.png)
+
+---
+
+## 🖥️ Dashboard & Interface
+
+HuntersDB provides a modern, fast UI to visualize active targets, view recon pipelines, and manage automated scanning.
+
+**Login Panel:**
+> ![Login Panel](/static/screenshots/login.png)
+
+**Main Dashboard:**
+> ![Main Dashboard](/static/screenshots/dashboard.png)
+
 ---
 
 ## 🔥 Key Features
@@ -32,6 +46,8 @@ Instead of running recon repeatedly, HuntersDB provides **ready-to-use, continuo
   * Vulnerability scanning (`nuclei`)
 * Data refreshed every **24 hours (or configurable)**
 
+> ![Recon Pipeline](/static/screenshots/features.png)
+
 ---
 
 ### 🧠 Recon Intelligence Engine
@@ -44,6 +60,8 @@ Enriched data per subdomain:
 * WAF detection
 * HTTP security headers
 * Email security (SPF, DKIM, DMARC)
+
+> ![Intelligence Modules](/static/screenshots/modules.png)
 
 ---
 
@@ -204,6 +222,8 @@ GET /api/intel/high-risk
 GET /api/intel/recon?subdomain=api.example.com
 GET /api/intel/changes?last=24h
 ```
+
+> ![Live Database Query Demo](/static/screenshots/query.png)
 
 ---
 
