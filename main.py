@@ -121,9 +121,6 @@ if _static_dir.exists():
 templates = Jinja2Templates(directory=str(_templates_dir)) if _templates_dir.exists() else None
 
 
-# ── Lifespan — defined above near app instantiation ──────────────────────────
-
-
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(projects_router)
 app.include_router(server_router)
@@ -131,13 +128,21 @@ app.include_router(recon_router)
 app.include_router(garbage_router)
 
 
+# ── Landing / Home page (PUBLIC — no auth required) ───────────────────────────
+@app.get("/home", response_class=HTMLResponse)
+async def home_page(request: Request):
+    """Public landing page. Accessible without login."""
+    if templates:
+        return templates.TemplateResponse(request, "home.html", {})
+    return HTMLResponse("<h1>Hunter's DB v8.0</h1><p>Template not found.</p>")
+
 
 # ── Auth routes ────────────────────────────────────────────────────────────────
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request, error: str = ""):
     user = get_current_user(request)
     if user:
-        return RedirectResponse(url="/", status_code=302)
+        return RedirectResponse(url="/dashboard", status_code=302)
     if templates:
         return templates.TemplateResponse(request, "login.html", {"error": error})
     # Fallback inline login page
@@ -156,7 +161,7 @@ async def login_submit(request: Request):
             "</form>", '<div class="error-msg">Invalid credentials</div></form>'), status_code=401)
 
     token = create_session_token(username)
-    response = RedirectResponse(url="/", status_code=302)
+    response = RedirectResponse(url="/dashboard", status_code=302)
     response.set_cookie(
         key=SESSION_COOKIE, value=token,
         max_age=86400, httponly=True, samesite="lax",
@@ -166,24 +171,37 @@ async def login_submit(request: Request):
 
 @app.get("/logout")
 async def logout():
-    response = RedirectResponse(url="/login", status_code=302)
+    response = RedirectResponse(url="/home", status_code=302)
     response.delete_cookie(SESSION_COOKIE)
     return response
 
 
-# ── Main UI ────────────────────────────────────────────────────────────────────
-
-
-@app.get("/projects/{pid}/recon-intel")
-async def recon_intel_redirect(pid: str, _: str = Depends(require_auth)):
-    """Redirect old recon_intel.html URL to main app (Recon Intel is now the 4th tab in project detail)."""
-    return RedirectResponse(url=f"/#project/{pid}/recon", status_code=302)
-
+# ── Root → redirect to home (landing page) ────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request, _: str = Depends(require_auth)):
+async def root(request: Request):
+    """Root URL redirects to public landing page."""
+    user = get_current_user(request)
+    if user:
+        # Already logged in → go straight to dashboard
+        return RedirectResponse(url="/dashboard", status_code=302)
+    # Not logged in → show landing page
+    return RedirectResponse(url="/home", status_code=302)
+
+
+# ── Dashboard (protected) ─────────────────────────────────────────────────────
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request, _: str = Depends(require_auth)):
+    """Main app dashboard — requires authentication."""
     if templates:
         return templates.TemplateResponse(request, "index.html", {})
     return HTMLResponse("<h1>Hunter's DB v8.0</h1><p>Template not found. Check templates/ directory.</p>")
+
+
+# ── Recon intel redirect ───────────────────────────────────────────────────────
+@app.get("/projects/{pid}/recon-intel")
+async def recon_intel_redirect(pid: str, _: str = Depends(require_auth)):
+    """Redirect old recon_intel.html URL to main app (Recon Intel is now the 4th tab in project detail)."""
+    return RedirectResponse(url=f"/dashboard#project/{pid}/recon", status_code=302)
 
 
 # ── Health check (no auth — for load balancers / k8s) ────────────────────────
@@ -269,7 +287,9 @@ if __name__ == "__main__":
     print("=" * 62)
     print("  Hunter's DB v8.0 — FastAPI | asyncpg | Redis Queue")
     print("=" * 62)
-    print(f"  API URL:  http://localhost:{port}")
+    print(f"  Home:     http://localhost:{port}/home   (public landing)")
+    print(f"  Login:    http://localhost:{port}/login")
+    print(f"  Dashboard:http://localhost:{port}/dashboard  (auth required)")
     print(f"  Worker:   python -m workers.queue_consumer")
     print(f"  DB:       PostgreSQL (asyncpg)")
     print(f"  Queue:    Redis")

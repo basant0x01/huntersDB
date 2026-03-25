@@ -29,12 +29,20 @@ async def api_garbage_list(
     page: int = Query(1, ge=1),
     per_page: int = Query(100, ge=1, le=1000),
     search: str = Query(""),
-    promoted: Optional[int] = Query(None),   # None=all, 0=not promoted, 1=promoted
+    promoted: Optional[str] = Query(None),   # None=all, '0'/'false'=not promoted, '1'/'true'=promoted
     sort: str = Query("score"),
     order: str = Query("asc"),
     _: str = Depends(require_auth),
 ):
     """Return garbage subdomains for a project with pagination."""
+    # Coerce promoted: accept int-string ('0'/'1'), bool-string ('true'/'false'), or None
+    promoted_filter: Optional[int] = None
+    if promoted is not None:
+        if promoted.lower() in ("1", "true"):
+            promoted_filter = 1
+        elif promoted.lower() in ("0", "false"):
+            promoted_filter = 0
+
     pool = await get_pool()
     offset = (page - 1) * per_page
 
@@ -50,9 +58,9 @@ async def api_garbage_list(
         conditions.append(f"subdomain ILIKE ${idx}")
         params.append(f"%{search}%")
         idx += 1
-    if promoted is not None:
+    if promoted_filter is not None:
         conditions.append(f"promoted=${idx}")
-        params.append(promoted)
+        params.append(promoted_filter)
         idx += 1
 
     where = "WHERE " + " AND ".join(conditions)
